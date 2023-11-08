@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/screens/menu.dart';
+import 'package:shopping_list/screens/shoplist_form.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -53,13 +54,13 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Tambah Produk'),
 
             // Bagian redirection ke ShopFormPage
-            // onTap: () {
-            //   Navigator.pushReplacement(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => const ShopFormPage(),
-            //       ));
-            // },
+            onTap: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ShopFormPage(),
+                  ));
+            },
           ),
         ],
       ),
