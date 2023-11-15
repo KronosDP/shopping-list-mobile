@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:shopping_list/screens/list_product.dart';
+import 'package:shopping_list/screens/login.dart';
 import 'package:shopping_list/widgets/left_drawer.dart';
 import 'package:shopping_list/screens/shoplist_form.dart';
 import 'package:shopping_list/widgets/shop_card.dart';
 
 class MyHomePage extends StatelessWidget {
+  //const MyHomePage({super.key, required this.title});
   MyHomePage({Key? key}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final List<ShopItem> items = [
     ShopItem("Lihat Produk", Icons.checklist),
@@ -27,7 +23,9 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Shopping List',
-        ), 
+        ),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
       ),
       drawer: const LeftDrawer(),
       body: SingleChildScrollView(
@@ -41,7 +39,7 @@ class MyHomePage extends StatelessWidget {
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 // Widget Text untuk menampilkan tulisan dengan alignment center dan style yang sesuai
                 child: Text(
-                  'Toko Kami', // Text yang menandakan toko
+                  'PBP Shop', // Text yang menandakan toko
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 30,
@@ -62,7 +60,7 @@ class MyHomePage extends StatelessWidget {
                   // Iterasi untuk setiap item
                   return ShopCard(item);
                 }).toList(),
-              ), // GridView.count
+              ),
             ],
           ),
         ),
@@ -78,11 +76,12 @@ class ShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Material(
       color: Colors.indigo,
       child: InkWell(
         // Area responsive terhadap sentuhan
-        onTap: () {
+        onTap: () async {
           // Memunculkan SnackBar ketika diklik
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -95,8 +94,30 @@ class ShopCard extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => const ShopFormPage(),
                 ));
-          }
+          } else if (item.name == "Lihat Produk") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ProductPage()));
+          } else if (item.name == "Logout") {
+            final response = await request.logout(
+                // Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
+                "http://10.0.2.2:8000/auth/logout/");
+            String message = response["message"];
 
+            if (response['status']) {
+              String uname = response["username"];
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("$message Sampai jumpa, $uname."),
+              ));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("$message"),
+              ));
+            }
+          }
         },
         child: Container(
           // Container untuk menyimpan Icon dan Text

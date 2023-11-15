@@ -6,5 +6,3 @@ class ShopItem {
 
   ShopItem(this.name, this.icon);
 }
-
-
